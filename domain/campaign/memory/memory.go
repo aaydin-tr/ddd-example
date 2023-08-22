@@ -5,11 +5,12 @@ import (
 
 	"github.com/aaydin-tr/e-commerce/domain/campaign"
 	"github.com/aaydin-tr/e-commerce/entity"
+	"github.com/aaydin-tr/e-commerce/valueobject"
 )
 
 type CampaignRepository struct {
 	campaigns map[string]*entity.Campaign
-	sync.RWMutex
+	mu        sync.RWMutex
 }
 
 func NewCampaignRepository() *CampaignRepository {
@@ -17,8 +18,8 @@ func NewCampaignRepository() *CampaignRepository {
 }
 
 func (r *CampaignRepository) Create(newCampaign *entity.Campaign) error {
-	r.Lock()
-	defer r.Unlock()
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
 	if r.campaigns[newCampaign.Name.Value()] != nil {
 		return campaign.ErrCampaignAlreadyExist
@@ -28,11 +29,11 @@ func (r *CampaignRepository) Create(newCampaign *entity.Campaign) error {
 	return nil
 }
 
-func (r *CampaignRepository) Get(name string) (*entity.Campaign, error) {
-	r.RLock()
-	defer r.RUnlock()
+func (r *CampaignRepository) Get(name valueobject.Name) (*entity.Campaign, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 
-	result := r.campaigns[name]
+	result := r.campaigns[name.Value()]
 	if result == nil {
 		return nil, campaign.ErrCampaignNotFound
 	}
