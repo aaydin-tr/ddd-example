@@ -1,40 +1,33 @@
 package memory
 
 import (
-	"sync"
-
 	"github.com/aaydin-tr/e-commerce/domain/campaign"
 	"github.com/aaydin-tr/e-commerce/entity"
+	"github.com/aaydin-tr/e-commerce/types"
 	"github.com/aaydin-tr/e-commerce/valueobject"
 )
 
 type CampaignRepository struct {
-	campaigns map[string]*entity.Campaign
-	mu        sync.RWMutex
+	storage types.Storage[*entity.Campaign]
 }
 
-func NewCampaignRepository() *CampaignRepository {
-	return &CampaignRepository{campaigns: make(map[string]*entity.Campaign)}
+func NewCampaignRepository(storage types.Storage[*entity.Campaign]) *CampaignRepository {
+	return &CampaignRepository{storage: storage}
 }
 
 func (r *CampaignRepository) Create(newCampaign *entity.Campaign) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	if r.campaigns[newCampaign.Name.Value()] != nil {
+	_, ok := r.storage.Get(newCampaign.Name.Value())
+	if ok {
 		return campaign.ErrCampaignAlreadyExist
 	}
 
-	r.campaigns[newCampaign.Name.Value()] = newCampaign
+	r.storage.Set(newCampaign.Name.Value(), newCampaign)
 	return nil
 }
 
 func (r *CampaignRepository) Get(name valueobject.Name) (*entity.Campaign, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	result := r.campaigns[name.Value()]
-	if result == nil {
+	result, ok := r.storage.Get(name.Value())
+	if !ok {
 		return nil, campaign.ErrCampaignNotFound
 	}
 

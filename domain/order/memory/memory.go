@@ -1,29 +1,25 @@
 package memory
 
 import (
-	"sync"
-
 	"github.com/aaydin-tr/e-commerce/domain/order"
 	"github.com/aaydin-tr/e-commerce/entity"
+	"github.com/aaydin-tr/e-commerce/types"
 )
 
 type OrderRepository struct {
-	orders map[string]*entity.Order
-	sync.RWMutex
+	storage types.Storage[*entity.Order]
 }
 
-func NewOrderRepository() *OrderRepository {
-	return &OrderRepository{orders: make(map[string]*entity.Order)}
+func NewOrderRepository(storage types.Storage[*entity.Order]) *OrderRepository {
+	return &OrderRepository{storage: storage}
 }
 
 func (r *OrderRepository) Create(newOrder *entity.Order) error {
-	r.Lock()
-	defer r.Unlock()
-
-	if r.orders[newOrder.ID.String()] != nil {
+	_, ok := r.storage.Get(newOrder.ID.String())
+	if ok {
 		return order.ErrOrderAlreadyExist
 	}
 
-	r.orders[newOrder.ID.String()] = newOrder
+	r.storage.Set(newOrder.ID.String(), newOrder)
 	return nil
 }

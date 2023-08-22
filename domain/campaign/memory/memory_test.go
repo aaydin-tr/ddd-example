@@ -5,6 +5,7 @@ import (
 
 	"github.com/aaydin-tr/e-commerce/domain/campaign"
 	"github.com/aaydin-tr/e-commerce/entity"
+	"github.com/aaydin-tr/e-commerce/pkg/storage"
 	"github.com/aaydin-tr/e-commerce/valueobject"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +16,7 @@ type testCase struct {
 }
 
 func TestMemoryCreateCampaign(t *testing.T) {
-	mockRepo := NewCampaignRepository()
+	mockRepo := NewCampaignRepository(storage.New[*entity.Campaign]())
 
 	cname, _ := valueobject.NewName("C1")
 
@@ -49,9 +50,9 @@ func TestMemoryCreateCampaign(t *testing.T) {
 }
 
 func TestMemoryGetCampaign(t *testing.T) {
-	mockRepo := NewCampaignRepository()
+	mockRepo := NewCampaignRepository(storage.New[*entity.Campaign]())
 	name, _ := valueobject.NewName("C1")
-	mockRepo.campaigns["C1"] = &entity.Campaign{Name: name}
+	mockRepo.storage.Set(name.Value(), &entity.Campaign{Name: name})
 
 	t.Run("Get campaign", func(t *testing.T) {
 		name, err := valueobject.NewName("C1")

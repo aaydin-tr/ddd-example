@@ -5,6 +5,7 @@ import (
 
 	"github.com/aaydin-tr/e-commerce/domain/order"
 	"github.com/aaydin-tr/e-commerce/entity"
+	"github.com/aaydin-tr/e-commerce/pkg/storage"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +16,7 @@ type testCase struct {
 }
 
 func TestMemoryCreateOrder(t *testing.T) {
-	mockRepo := NewOrderRepository()
+	mockRepo := NewOrderRepository(storage.New[*entity.Order]())
 	uuid := uuid.New()
 
 	t.Run("Create order", func(t *testing.T) {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/aaydin-tr/e-commerce/domain/product"
 	"github.com/aaydin-tr/e-commerce/entity"
+	"github.com/aaydin-tr/e-commerce/pkg/storage"
 	"github.com/aaydin-tr/e-commerce/valueobject"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +16,7 @@ type testCase struct {
 }
 
 func TestMemoryCreateProduct(t *testing.T) {
-	mockRepo := NewProductRepository()
+	mockRepo := NewProductRepository(storage.New[*entity.Product]())
 	code, _ := valueobject.NewCode("P1")
 
 	t.Run("Create product", func(t *testing.T) {
@@ -41,9 +42,9 @@ func TestMemoryCreateProduct(t *testing.T) {
 }
 
 func TestMemoryGetProduct(t *testing.T) {
-	mockRepo := NewProductRepository()
+	mockRepo := NewProductRepository(storage.New[*entity.Product]())
 	code, _ := valueobject.NewCode("P1")
-	mockRepo.products["P1"] = &entity.Product{Code: code}
+	mockRepo.storage.Set(code.Value(), &entity.Product{Code: code})
 
 	t.Run("Get product", func(t *testing.T) {
 		name, err := valueobject.NewCode(code.Value())
