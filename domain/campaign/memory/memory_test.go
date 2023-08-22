@@ -10,38 +10,34 @@ import (
 )
 
 type testCase struct {
-	name         string
-	campaignName string
-	expectedErr  error
+	name        string
+	expectedErr error
 }
 
 func TestMemoryCreateCampaign(t *testing.T) {
 	mockRepo := NewCampaignRepository()
 
+	cname, _ := valueobject.NewName("C1")
+
 	t.Run("Create campaign", func(t *testing.T) {
 		c := testCase{
-			name:         "Create campaign new campaign",
-			campaignName: "C1",
-			expectedErr:  nil,
+			name:        "Create campaign new campaign",
+			expectedErr: nil,
 		}
 
-		name, err := valueobject.NewName(c.campaignName)
-		assert.NoError(t, err)
+		campaign := &entity.Campaign{Name: cname}
 
-		campaign := &entity.Campaign{Name: name}
-
-		err = mockRepo.Create(campaign)
+		err := mockRepo.Create(campaign)
 		assert.ErrorIs(t, c.expectedErr, err)
 	})
 
 	t.Run("Create campaign which already exist", func(t *testing.T) {
 		c := testCase{
-			name:         "Create campaign new campaign",
-			campaignName: "C1",
-			expectedErr:  campaign.ErrCampaignAlreadyExist,
+			name:        "Create campaign new campaign",
+			expectedErr: campaign.ErrCampaignAlreadyExist,
 		}
 
-		name, err := valueobject.NewName(c.campaignName)
+		name, err := valueobject.NewName(cname.Value())
 		assert.NoError(t, err)
 
 		campaign := &entity.Campaign{Name: name}
