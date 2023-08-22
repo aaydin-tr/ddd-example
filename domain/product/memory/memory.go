@@ -28,7 +28,7 @@ func (r *ProductRepository) Get(code valueobject.Code) (*entity.Product, error) 
 	return r.products[code.Value()], nil
 }
 
-func (r *ProductRepository) Save(newProduct *entity.Product) error {
+func (r *ProductRepository) Create(newProduct *entity.Product) error {
 	r.Lock()
 	defer r.Unlock()
 

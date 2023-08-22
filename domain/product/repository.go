@@ -14,5 +14,5 @@ var (
 
 type ProductRepository interface {
 	Get(code valueobject.Code) (*entity.Product, error)
-	Save(product *entity.Product) error
+	Create(product *entity.Product) error
 }
