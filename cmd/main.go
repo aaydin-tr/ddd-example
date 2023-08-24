@@ -25,7 +25,7 @@ func main() {
 
 	productService := product.NewProductService(productRepository)
 	orderService := order.NewOrderService(productRepository, orderRepository)
-	campaignService := campaign.NewCampaignService(campaignRepository, orderRepository, productRepository)
+	campaignService := campaign.NewCampaignService(campaignRepository, productRepository)
 
 	app := app.NewApp(productService, orderService, campaignService)
 	fmt.Println("Please enter command")

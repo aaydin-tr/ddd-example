@@ -11,29 +11,25 @@ import (
 	"github.com/google/uuid"
 
 	mockCampaign "github.com/aaydin-tr/e-commerce/mock/repository/campaign"
-	mockOrder "github.com/aaydin-tr/e-commerce/mock/repository/order"
 	mockProduct "github.com/aaydin-tr/e-commerce/mock/repository/product"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
 
 var mockCampaignRepo *mockCampaign.MockCampaignRepository
-var mockOrderRepo *mockOrder.MockOrderRepository
 var mockProductRepo *mockProduct.MockProductRepository
 
 func setup(t *testing.T) (*CampaignService, func()) {
 	ct := gomock.NewController(t)
 
 	mockCampaignRepo = mockCampaign.NewMockCampaignRepository(ct)
-	mockOrderRepo = mockOrder.NewMockOrderRepository(ct)
 	mockProductRepo = mockProduct.NewMockProductRepository(ct)
 
-	campaignService := NewCampaignService(mockCampaignRepo, mockOrderRepo, mockProductRepo)
+	campaignService := NewCampaignService(mockCampaignRepo, mockProductRepo)
 
 	return campaignService, func() {
 		ct.Finish()
 		mockCampaignRepo = nil
-		mockOrderRepo = nil
 		mockProductRepo = nil
 	}
 }
@@ -42,13 +38,11 @@ func TestNewCampaignService(t *testing.T) {
 	ct := gomock.NewController(t)
 
 	mockCampaignRepo = mockCampaign.NewMockCampaignRepository(ct)
-	mockOrderRepo = mockOrder.NewMockOrderRepository(ct)
 	mockProductRepo = mockProduct.NewMockProductRepository(ct)
 
-	campaignService := NewCampaignService(mockCampaignRepo, mockOrderRepo, mockProductRepo)
+	campaignService := NewCampaignService(mockCampaignRepo, mockProductRepo)
 
 	assert.Equal(t, campaignService.campaignRepository, mockCampaignRepo)
-	assert.Equal(t, campaignService.orderRepository, mockOrderRepo)
 	assert.Equal(t, campaignService.productRepository, mockProductRepo)
 
 	ct.Finish()

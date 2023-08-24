@@ -22,7 +22,7 @@ func setup(t *testing.T) *App {
 
 	mockProductService := product.NewProductService(mockProductRepository)
 	mockOrderService := order.NewOrderService(mockProductRepository, mockOrderRepository)
-	mockCampaignService := campaign.NewCampaignService(mockCampaignRepository, mockOrderRepository, mockProductRepository)
+	mockCampaignService := campaign.NewCampaignService(mockCampaignRepository, mockProductRepository)
 
 	return NewApp(mockProductService, mockOrderService, mockCampaignService)
 }

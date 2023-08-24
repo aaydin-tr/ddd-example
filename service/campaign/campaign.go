@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/aaydin-tr/e-commerce/domain/campaign"
-	"github.com/aaydin-tr/e-commerce/domain/order"
 	"github.com/aaydin-tr/e-commerce/domain/product"
 	"github.com/aaydin-tr/e-commerce/entity"
 	"github.com/aaydin-tr/e-commerce/valueobject"
@@ -19,17 +18,14 @@ var (
 
 type CampaignService struct {
 	campaignRepository campaign.CampaignRepository
-	orderRepository    order.OrderRepository
 	productRepository  product.ProductRepository
 }
 
 func NewCampaignService(campaignRepository campaign.CampaignRepository,
-	orderRepository order.OrderRepository,
 	productRepository product.ProductRepository,
 ) *CampaignService {
 	return &CampaignService{
 		campaignRepository: campaignRepository,
-		orderRepository:    orderRepository,
 		productRepository:  productRepository,
 	}
 }
