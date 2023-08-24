@@ -33,3 +33,17 @@ func (r *CampaignRepository) Get(name valueobject.Name) (*entity.Campaign, error
 
 	return result, nil
 }
+
+func (r *CampaignRepository) Exist(name valueobject.Name) bool {
+	_, ok := r.storage.Get(name.Value())
+	return ok
+}
+
+func (r *CampaignRepository) GetAll() []*entity.Campaign {
+	var result []*entity.Campaign
+	for _, item := range r.storage.Values() {
+		result = append(result, item)
+	}
+
+	return result
+}
