@@ -6,7 +6,7 @@ import (
 )
 
 type Order struct {
-	ID          uuid.UUID
-	ProductCode valueobject.Code
-	Quantity    valueobject.Quantity
+	ID        uuid.UUID
+	ProductID uuid.UUID
+	Quantity  valueobject.Quantity
 }
