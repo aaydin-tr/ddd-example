@@ -7,18 +7,18 @@ var (
 )
 
 type Price struct {
-	value float32
+	value float64
 }
 
-func NewPrice(value float32) (Price, error) {
-	if value < 0 {
+func NewPrice(value float64) (Price, error) {
+	if value <= 0 {
 		return Price{}, ErrPriceMustBePositive
 	}
 
 	return Price{value: value}, nil
 }
 
-func (p Price) Value() float32 {
+func (p Price) Value() float64 {
 	return p.value
 }
 
