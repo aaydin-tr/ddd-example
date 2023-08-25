@@ -60,7 +60,7 @@ func (p *Product) Discount(pm valueobject.PriceManipulationLimit) {
 	sellCount := p.InititalStock.Value() - p.Stock.Value()
 	salesRate := float64(sellCount) / float64(p.TotalDemandCount.Value()) * 100
 	priceChange := (salesRate - 50) * float64(pm.Value()) / 50
-	priceDiff := p.InititalPrice.Value() + priceChange
+	newPrice := p.InititalPrice.Value() + priceChange
 
-	p.UpdatePrice(priceDiff)
+	p.UpdatePrice(newPrice)
 }
