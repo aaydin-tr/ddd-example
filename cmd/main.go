@@ -24,7 +24,7 @@ func main() {
 	campaignRepository := campaignRepo.NewCampaignRepository(storage.New[*entity.Campaign]())
 
 	productService := product.NewProductService(productRepository)
-	orderService := order.NewOrderService(productRepository, orderRepository)
+	orderService := order.NewOrderService(orderRepository)
 	campaignService := campaign.NewCampaignService(campaignRepository)
 
 	app := app.NewApp(productService, orderService, campaignService)

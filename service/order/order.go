@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/aaydin-tr/e-commerce/domain/order"
-	"github.com/aaydin-tr/e-commerce/domain/product"
 	entity "github.com/aaydin-tr/e-commerce/entity"
 	"github.com/aaydin-tr/e-commerce/valueobject"
 	"github.com/google/uuid"
@@ -15,26 +14,15 @@ var (
 )
 
 type OrderService struct {
-	productRepository product.ProductRepository
-	orderRepository   order.OrderRepository
+	orderRepository order.OrderRepository
 }
 
-func NewOrderService(productRepository product.ProductRepository, orderRepository order.OrderRepository) *OrderService {
-	return &OrderService{productRepository: productRepository, orderRepository: orderRepository}
+func NewOrderService(orderRepository order.OrderRepository) *OrderService {
+	return &OrderService{orderRepository: orderRepository}
 }
 
-func (s *OrderService) Create(productCode string, orderQuantity int) error {
-	code, err := valueobject.NewCode(productCode)
-	if err != nil {
-		return err
-	}
-
+func (s *OrderService) Create(product *entity.Product, orderQuantity int) error {
 	quantity, err := valueobject.NewQuantity(orderQuantity)
-	if err != nil {
-		return err
-	}
-
-	product, err := s.productRepository.Get(code)
 	if err != nil {
 		return err
 	}

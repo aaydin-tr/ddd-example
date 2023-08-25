@@ -110,7 +110,12 @@ func (this *App) createOrder(params []string) (string, error) {
 		return "", ErrQuantityMustBeInt
 	}
 
-	err = this.orderSerivce.Create(code, quantity)
+	product, err := this.productService.Get(code)
+	if err != nil {
+		return "", err
+	}
+
+	err = this.orderSerivce.Create(product, quantity)
 	if err != nil {
 		return "", err
 	}
