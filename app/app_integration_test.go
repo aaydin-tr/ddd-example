@@ -12,6 +12,7 @@ import (
 type integationTestCase struct {
 	name                     string
 	productCode              string
+	campaignCode             string
 	commands                 []commandTestCase
 	isCampaign               bool
 	expectedLastPrice        float64
@@ -69,9 +70,10 @@ func TestAppIntegration(t *testing.T) {
 			expectedLastStock: 100,
 		},
 		{
-			name:        "Create product with campaign and sell half of the stock without price change",
-			isCampaign:  true,
-			productCode: "P1",
+			name:         "Create product with campaign and sell half of the stock without price change",
+			isCampaign:   true,
+			campaignCode: "C1",
+			productCode:  "P1",
 			commands: []commandTestCase{
 				{args: "create_product P1 100 100", msg: "Product created; code P1, price 100.0, stock 100"},
 				{args: "create_campaign C1 P1 10 20 100", msg: "Campaign created; name C1, product P1, duration 10, limit 20, target sales count 100"},
@@ -87,9 +89,10 @@ func TestAppIntegration(t *testing.T) {
 			expectedCampaignStatus:   valueobject.Active,
 		},
 		{
-			name:        "Create product with campaign and sell all of the stock without price change",
-			isCampaign:  true,
-			productCode: "P1",
+			name:         "Create product with campaign and sell all of the stock without price change",
+			isCampaign:   true,
+			productCode:  "P1",
+			campaignCode: "C1",
 			commands: []commandTestCase{
 				{args: "create_product P1 100 100", msg: "Product created; code P1, price 100.0, stock 100"},
 				{args: "create_campaign C1 P1 10 20 100", msg: "Campaign created; name C1, product P1, duration 10, limit 20, target sales count 100"},
@@ -105,9 +108,10 @@ func TestAppIntegration(t *testing.T) {
 			expectedCampaignStatus:   valueobject.Ended,
 		},
 		{
-			name:        "Create product with campaign and sell more than the stock without price change",
-			isCampaign:  true,
-			productCode: "P1",
+			name:         "Create product with campaign and sell more than the stock without price change",
+			isCampaign:   true,
+			campaignCode: "C1",
+			productCode:  "P1",
 			commands: []commandTestCase{
 				{args: "create_product P1 100 200", msg: "Product created; code P1, price 100.0, stock 200"},
 				{args: "create_campaign C1 P1 10 20 100", msg: "Campaign created; name C1, product P1, duration 10, limit 20, target sales count 100"},
@@ -123,9 +127,10 @@ func TestAppIntegration(t *testing.T) {
 			expectedCampaignStatus:   valueobject.Ended,
 		},
 		{
-			name:        "Create product with campaign price increase",
-			isCampaign:  true,
-			productCode: "P1",
+			name:         "Create product with campaign price increase",
+			isCampaign:   true,
+			productCode:  "P1",
+			campaignCode: "C1",
 			commands: []commandTestCase{
 				{args: "create_product P1 100 100", msg: "Product created; code P1, price 100.0, stock 100"},
 				{args: "create_campaign C1 P1 10 20 100", msg: "Campaign created; name C1, product P1, duration 10, limit 20, target sales count 100"},
@@ -142,9 +147,10 @@ func TestAppIntegration(t *testing.T) {
 			expectedCampaignStatus:   valueobject.Active,
 		},
 		{
-			name:        "Create product with campaign price decrease",
-			isCampaign:  true,
-			productCode: "P1",
+			name:         "Create product with campaign price decrease",
+			isCampaign:   true,
+			productCode:  "P1",
+			campaignCode: "C1",
 			commands: []commandTestCase{
 				{args: "create_product P1 100 100", msg: "Product created; code P1, price 100.0, stock 100"},
 				{args: "create_campaign C1 P1 10 20 100", msg: "Campaign created; name C1, product P1, duration 10, limit 20, target sales count 100"},
@@ -159,6 +165,63 @@ func TestAppIntegration(t *testing.T) {
 			expectedTurnover:         0,
 			expectedAverageItemPrice: 0,
 			expectedCampaignStatus:   valueobject.Active,
+		},
+
+		{
+			name:         "Campaign should be ended when the duration is over",
+			isCampaign:   true,
+			productCode:  "P1",
+			campaignCode: "C1",
+			commands: []commandTestCase{
+				{args: "create_product P1 100 100", msg: "Product created; code P1, price 100.0, stock 100"},
+				{args: "create_campaign C1 P1 1 20 100", msg: "Campaign created; name C1, product P1, duration 1, limit 20, target sales count 100"},
+				{args: "increase_time 1", msg: "Time is 01:00"},
+				{args: "get_campaign_info C1", msg: "Campaign C1 info; Status Ended, Target Sales 100, Total Sales 0, Turnover 0.0, Average Item Price 0.0"},
+			},
+			expectedLastPrice:        100,
+			expectedLastStock:        100,
+			expectedSalesCount:       0,
+			expectedTurnover:         0,
+			expectedAverageItemPrice: 0,
+			expectedCampaignStatus:   valueobject.Ended,
+		},
+		{
+			name:         "Campaign should be ended when the target sales count is reached",
+			isCampaign:   true,
+			productCode:  "P1",
+			campaignCode: "C1",
+			commands: []commandTestCase{
+				{args: "create_product P1 100 200", msg: "Product created; code P1, price 100.0, stock 200"},
+				{args: "create_campaign C1 P1 10 20 100", msg: "Campaign created; name C1, product P1, duration 10, limit 20, target sales count 100"},
+				{args: "create_order P1 100", msg: "Order created; product P1, quantity 100"},
+				{args: "increase_time 1", msg: "Time is 01:00"},
+				{args: "get_campaign_info C1", msg: "Campaign C1 info; Status Ended, Target Sales 100, Total Sales 100, Turnover 10000.0, Average Item Price 100.0"},
+			},
+			expectedLastPrice:        100,
+			expectedLastStock:        100,
+			expectedSalesCount:       100,
+			expectedTurnover:         10000,
+			expectedAverageItemPrice: 100,
+			expectedCampaignStatus:   valueobject.Ended,
+		},
+		{
+			name:         "Product price should be initial price when the campaign is ended",
+			isCampaign:   true,
+			productCode:  "P1",
+			campaignCode: "C1",
+			commands: []commandTestCase{
+				{args: "create_product P1 100 200", msg: "Product created; code P1, price 100.0, stock 200"},
+				{args: "create_campaign C1 P1 10 20 100", msg: "Campaign created; name C1, product P1, duration 10, limit 20, target sales count 100"},
+				{args: "create_order P1 100", msg: "Order created; product P1, quantity 100"},
+				{args: "increase_time 1", msg: "Time is 01:00"},
+				{args: "get_product_info P1", msg: "Product P1 info; price 100.0, stock 100"},
+			},
+			expectedLastPrice:        100,
+			expectedLastStock:        100,
+			expectedSalesCount:       100,
+			expectedTurnover:         10000,
+			expectedAverageItemPrice: 100,
+			expectedCampaignStatus:   valueobject.Ended,
 		},
 	}
 
@@ -178,10 +241,12 @@ func TestAppIntegration(t *testing.T) {
 			assert.Equal(t, testCase.expectedLastStock, product.Stock.Value())
 
 			if testCase.isCampaign {
-				assert.Equal(t, testCase.expectedSalesCount, product.Campaign.TotalSales.Value())
-				assert.Equal(t, testCase.expectedTurnover, (float64(product.Campaign.TotalSales.Value()) * product.Campaign.AverageItemPrice.Value()))
-				assert.Equal(t, testCase.expectedAverageItemPrice, product.Campaign.AverageItemPrice.Value())
-				assert.Equal(t, testCase.expectedCampaignStatus, product.Campaign.Status.Value())
+				campaign, err := app.campaignSerivce.Get(testCase.campaignCode)
+				assert.NoError(t, err)
+				assert.Equal(t, testCase.expectedSalesCount, campaign.TotalSales.Value())
+				assert.Equal(t, testCase.expectedTurnover, (float64(campaign.TotalSales.Value()) * campaign.AverageItemPrice.Value()))
+				assert.Equal(t, testCase.expectedAverageItemPrice, campaign.AverageItemPrice.Value())
+				assert.Equal(t, testCase.expectedCampaignStatus, campaign.Status.Value())
 			}
 		})
 	}
