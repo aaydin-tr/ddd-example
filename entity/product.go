@@ -53,7 +53,7 @@ func (p *Product) RemoveCampaign() {
 }
 
 func (p *Product) Discount(pm valueobject.PriceManipulationLimit) {
-	if p.Stock.Value() == 0 {
+	if p.Stock.Value() == 0 || p.TotalDemandCount.Value() == 0 {
 		return
 	}
 
