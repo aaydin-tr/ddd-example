@@ -8,7 +8,7 @@ import (
 type Campaign struct {
 	ID                     uuid.UUID
 	Name                   valueobject.Name
-	ProductCode            valueobject.Code
+	Product                *Product
 	Duration               valueobject.Duration
 	PriceManipulationLimit valueobject.PriceManipulationLimit
 	TargetSalesCount       valueobject.TargetSalesCount

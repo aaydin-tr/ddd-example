@@ -103,8 +103,10 @@ func TestOrderService_Create(t *testing.T) {
 		status, _ := valueobject.NewStatus(valueobject.Active)
 		price, _ := valueobject.NewPrice(10)
 
-		campaign := &entity.Campaign{Name: campaignName, ProductCode: code, TargetSalesCount: targetSalesCount, Status: status}
-		product := &entity.Product{Stock: stock, Campaign: campaign, Price: price}
+		product := &entity.Product{Stock: stock, Price: price}
+		campaign := &entity.Campaign{Name: campaignName, Product: product, TargetSalesCount: targetSalesCount, Status: status}
+		product.Campaign = campaign
+
 		mockProductRepo.EXPECT().Get(code).Return(product, nil)
 		mockOrderRepo.EXPECT().Create(gomock.Any()).Return(nil)
 
@@ -126,8 +128,10 @@ func TestOrderService_Create(t *testing.T) {
 		status, _ := valueobject.NewStatus(valueobject.Active)
 		price, _ := valueobject.NewPrice(10)
 
-		campaign := &entity.Campaign{Name: campaignName, ProductCode: code, TargetSalesCount: targetSalesCount, Status: status}
-		product := &entity.Product{Stock: stock, Campaign: campaign, Price: price}
+		product := &entity.Product{Stock: stock, Price: price}
+		campaign := &entity.Campaign{Name: campaignName, Product: product, TargetSalesCount: targetSalesCount, Status: status}
+		product.Campaign = campaign
+
 		mockProductRepo.EXPECT().Get(code).Return(product, nil)
 		mockOrderRepo.EXPECT().Create(gomock.Any()).Return(nil)
 
