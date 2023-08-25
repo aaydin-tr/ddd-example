@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"testing"
 
 	campaignRepo "github.com/aaydin-tr/e-commerce/domain/campaign/memory"
@@ -22,7 +23,7 @@ func setup(t *testing.T) *App {
 
 	mockProductService := product.NewProductService(mockProductRepository)
 	mockOrderService := order.NewOrderService(mockProductRepository, mockOrderRepository)
-	mockCampaignService := campaign.NewCampaignService(mockCampaignRepository, mockProductRepository)
+	mockCampaignService := campaign.NewCampaignService(mockCampaignRepository)
 
 	return NewApp(mockProductService, mockOrderService, mockCampaignService)
 }
@@ -204,10 +205,10 @@ func TestAppCreateCampaign(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "Campaign created; name C1, product P1, duration 10, limit 20, target sales count 3", msg)
 
-		c, err := app.campaignSerivce.GetCampaignInfo("C1")
+		c, err := app.campaignSerivce.Get("C1")
 		assert.NoError(t, err)
 		assert.Equal(t, "C1", c.Name.Value())
-		assert.Equal(t, "P1", c.ProductCode.Value())
+		assert.Equal(t, "P1", c.Product.Code.Value())
 		assert.Equal(t, 10, c.Duration.Value())
 		assert.Equal(t, 20, c.PriceManipulationLimit.Value())
 		assert.Equal(t, 3, c.TargetSalesCount.Value())
@@ -218,7 +219,8 @@ func TestAppCreateCampaign(t *testing.T) {
 func TestAppGetCampaignInfo(t *testing.T) {
 	app := setup(t)
 	app.productService.Create("P1", 100, 1000)
-	app.campaignSerivce.CreateCampaign("C1", "P1", 10, 20, 100)
+	product, _ := app.productService.Get("P1")
+	app.campaignSerivce.Create("C1", product, 10, 20, 100)
 
 	t.Parallel()
 
@@ -245,7 +247,8 @@ func TestAppGetCampaignInfo(t *testing.T) {
 func TestAppIncreaseTime(t *testing.T) {
 	app := setup(t)
 	app.productService.Create("P1", 100, 1000)
-	app.campaignSerivce.CreateCampaign("C1", "P1", 10, 20, 100)
+	product, _ := app.productService.Get("P1")
+	app.campaignSerivce.Create("C1", product, 10, 20, 100)
 
 	t.Parallel()
 
@@ -261,15 +264,9 @@ func TestAppIncreaseTime(t *testing.T) {
 		assert.Equal(t, "", msg)
 	})
 
-	t.Run("no campaign", func(t *testing.T) {
-		newApp := setup(t)
-		msg, err := newApp.increaseTime([]string{"10"})
-		assert.NotNil(t, err)
-		assert.Equal(t, "", msg)
-	})
-
 	t.Run("valid parameters", func(t *testing.T) {
 		msg, err := app.increaseTime([]string{"10"})
+		fmt.Println(msg, err)
 		assert.NoError(t, err)
 		assert.Equal(t, "Time is 10:00", msg)
 		assert.Equal(t, 10, app.systemTime.Hour())

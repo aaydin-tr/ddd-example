@@ -12,15 +12,16 @@ import (
 )
 
 var (
-	ErrCommandNotFound      = errors.New("Command not found")
-	ErrInvalidParameters    = errors.New("Invalid parameters")
-	ErrPriceMustBeFloat     = errors.New("Price must be float")
-	ErrStockMustBeInt       = errors.New("Stock must be integer")
-	ErrQuantityMustBeInt    = errors.New("Quantity must be integer")
-	ErrDurationMustBeInt    = errors.New("Duration must be integer")
-	ErrLimitMustBeInt       = errors.New("Limit must be integer")
-	ErrTargetSalesMustBeInt = errors.New("Target sales must be integer")
-	ErrHourMustBeInt        = errors.New("Hour must be integer")
+	ErrCommandNotFound            = errors.New("Command not found")
+	ErrInvalidParameters          = errors.New("Invalid parameters")
+	ErrPriceMustBeFloat           = errors.New("Price must be float")
+	ErrStockMustBeInt             = errors.New("Stock must be integer")
+	ErrQuantityMustBeInt          = errors.New("Quantity must be integer")
+	ErrDurationMustBeInt          = errors.New("Duration must be integer")
+	ErrLimitMustBeInt             = errors.New("Limit must be integer")
+	ErrTargetSalesMustBeInt       = errors.New("Target sales must be integer")
+	ErrHourMustBeInt              = errors.New("Hour must be integer")
+	ErrCampaignDoesNotHaveProduct = errors.New("Campaign does not have product")
 )
 
 type App struct {
@@ -137,7 +138,12 @@ func (this *App) createCampaign(params []string) (string, error) {
 		return "", ErrTargetSalesMustBeInt
 	}
 
-	err = this.campaignSerivce.CreateCampaign(name, code, duration, limit, targetSalesCount)
+	product, err := this.productService.Get(code)
+	if err != nil {
+		return "", err
+	}
+
+	err = this.campaignSerivce.Create(name, product, duration, limit, targetSalesCount)
 	if err != nil {
 		return "", err
 	}
@@ -150,7 +156,7 @@ func (this *App) getCampaignInfo(params []string) (string, error) {
 		return "", ErrInvalidParameters
 	}
 
-	result, err := this.campaignSerivce.GetCampaignInfo(params[0])
+	result, err := this.campaignSerivce.Get(params[0])
 	if err != nil {
 		return "", err
 	}
@@ -169,9 +175,25 @@ func (this *App) increaseTime(params []string) (string, error) {
 	}
 
 	this.systemTime = this.systemTime.Add(time.Duration(hour) * time.Hour)
-	err = this.campaignSerivce.IncreaseTime(hour)
+	campaigns, err := this.campaignSerivce.GetAll()
 	if err != nil {
 		return "", err
+	}
+
+	for _, campaign := range campaigns {
+
+		if campaign.Product == nil {
+			return "", ErrCampaignDoesNotHaveProduct
+		}
+
+		campaign.DecreaseDuration(hour)
+		if campaign.Duration.Value() <= 0 {
+			campaign.Close()
+			campaign.Product.RemoveCampaign()
+			continue
+		}
+
+		campaign.Product.Discount(campaign.PriceManipulationLimit)
 	}
 
 	return fmt.Sprintf("Time is %s", this.systemTime.Format("15:00")), nil
