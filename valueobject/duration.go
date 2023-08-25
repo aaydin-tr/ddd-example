@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	ErrDurationLessThanZero = errors.New("Duration can not be less than zero or equal to zero")
+	ErrDurationLessThanZero = errors.New("Duration can not be less than zero")
 )
 
 type Duration struct {
@@ -13,7 +13,7 @@ type Duration struct {
 }
 
 func NewDuration(value int) (Duration, error) {
-	if value <= 0 {
+	if value < 0 {
 		return Duration{}, ErrDurationLessThanZero
 	}
 
