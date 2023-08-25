@@ -14,6 +14,12 @@ var (
 	ErrTargetSalesCountMustBeLessThanStock = errors.New("Target sales count must be less than stock")
 )
 
+type CampaignServiceInterface interface {
+	Create(campaignName string, product *entity.Product, campaignDuration int, campaignPriceManipulationLimit int, campaignTargetSalesCount int) error
+	Get(campaignName string) (*entity.Campaign, error)
+	GetAll() ([]*entity.Campaign, error)
+}
+
 type CampaignService struct {
 	campaignRepository campaign.CampaignRepository
 }

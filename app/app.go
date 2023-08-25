@@ -27,12 +27,12 @@ var (
 type App struct {
 	systemTime      time.Time
 	commands        map[string]func(params []string) (string, error)
-	productService  *product.ProductService
-	orderSerivce    *order.OrderService
-	campaignSerivce *campaign.CampaignService
+	productService  product.ProductServiceInterface
+	orderSerivce    order.OrderServiceInterface
+	campaignSerivce campaign.CampaignServiceInterface
 }
 
-func NewApp(productService *product.ProductService, orderService *order.OrderService, campaignService *campaign.CampaignService) *App {
+func NewApp(productService product.ProductServiceInterface, orderService order.OrderServiceInterface, campaignService campaign.CampaignServiceInterface) *App {
 
 	app := &App{
 		systemTime:      time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC),

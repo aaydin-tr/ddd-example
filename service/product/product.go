@@ -7,6 +7,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type ProductServiceInterface interface {
+	Create(productCode string, productPrice float64, productStock int) error
+	Get(productCode string) (*entity.Product, error)
+}
+
 type ProductService struct {
 	productRepository product.ProductRepository
 }

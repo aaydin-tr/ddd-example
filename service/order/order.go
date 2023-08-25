@@ -13,6 +13,10 @@ var (
 	ErrInsufficientStock = errors.New("Insufficient stock")
 )
 
+type OrderServiceInterface interface {
+	Create(product *entity.Product, orderQuantity int) error
+}
+
 type OrderService struct {
 	orderRepository order.OrderRepository
 }
