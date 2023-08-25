@@ -66,7 +66,7 @@ func TestCampaignServiceCreateCampaign(t *testing.T) {
 	t.Run("should return error when campaign duration is invalid", func(t *testing.T) {
 		mockCampaignRepo.EXPECT().Exist(gomock.Any()).Return(false)
 
-		err := campaignService.Create("C1", mockProduct, 0, 20, 100)
+		err := campaignService.Create("C1", mockProduct, -1, 20, 100)
 		assert.NotNil(t, err)
 	})
 
