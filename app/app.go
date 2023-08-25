@@ -192,7 +192,7 @@ func (this *App) increaseTime(params []string) (string, error) {
 		}
 
 		campaign.DecreaseDuration(hour)
-		if campaign.Duration.Value() <= 0 {
+		if campaign.Duration.Value() == 0 || campaign.TotalSales.Value() == campaign.TargetSalesCount.Value() {
 			campaign.Close()
 			campaign.Product.RemoveCampaign()
 			continue
