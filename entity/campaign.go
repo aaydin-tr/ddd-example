@@ -42,7 +42,12 @@ func (c *Campaign) IsActive() bool {
 }
 
 func (c *Campaign) DecreaseDuration(duration int) error {
-	newDuration, err := valueobject.NewDuration(c.Duration.Value() - duration)
+	decreaseDuration := c.Duration.Value() - duration
+	if decreaseDuration < 0 {
+		decreaseDuration = 0
+	}
+
+	newDuration, err := valueobject.NewDuration(decreaseDuration)
 	if err != nil {
 		return err
 	}
