@@ -1,0 +1,17 @@
+create_product ABC 100 100
+create_campaign C1 ABC 5 20 50
+create_order ABC 10
+increase_time 1
+get_product_info ABC
+get_product_info ABC
+get_product_info ABC
+increase_time 1
+get_product_info ABC
+increase_time 1
+get_product_info ABC
+increase_time 1
+get_product_info ABC
+increase_time 2
+get_product_info ABC
+get_campaign_info C1
+
