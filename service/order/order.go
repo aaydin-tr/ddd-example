@@ -35,7 +35,6 @@ func (s *OrderService) Create(product *entity.Product, orderQuantity int) error 
 		return ErrInsufficientStock
 	}
 
-	// TODO : Create order
 	err = s.orderRepository.Create(&entity.Order{
 		ID:        uuid.New(),
 		ProductID: product.ID,
@@ -54,7 +53,6 @@ func (s *OrderService) Create(product *entity.Product, orderQuantity int) error 
 	}
 
 	remainingTargetSaleCount := product.Campaign.RemainingTargetSalesCount(quantity.Value())
-	// TODO check stock is enough for campaign
 	var avaibleStockForCampaign int
 	if remainingTargetSaleCount <= 0 {
 		avaibleStockForCampaign = product.Campaign.TargetSalesCount.Value() - product.Campaign.TotalSales.Value()
