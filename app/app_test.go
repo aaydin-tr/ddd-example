@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"testing"
 
 	campaignRepo "github.com/aaydin-tr/e-commerce/domain/campaign/memory"
@@ -266,7 +265,6 @@ func TestAppIncreaseTime(t *testing.T) {
 
 	t.Run("valid parameters", func(t *testing.T) {
 		msg, err := app.increaseTime([]string{"10"})
-		fmt.Println(msg, err)
 		assert.NoError(t, err)
 		assert.Equal(t, "Time is 10:00", msg)
 		assert.Equal(t, 10, app.systemTime.Hour())
